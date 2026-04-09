@@ -1,0 +1,554 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>DESAFIO SB 21D</title>
+  <style>
+    /* Import de fontes Google (Bebas Neue para títulos, Inter para corpo) */
+    @import url('https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Inter:wght@300;400;600;700&display=swap');
+
+    :root{
+      --bg-dark: #0a0a0a;
+      --bg-dark-2: #111111;
+      --gold: #FFB800;
+      --white: #ffffff;
+      --gray-dark: #1a1a1a;
+      --input-bg: #222222;
+      --input-border: #333333;
+      --muted: #bdbdbd;
+    }
+
+    /* Reset e estilo base */
+    *{box-sizing:border-box}
+    html,body{height:100%;}
+    body{
+      margin:0;
+      font-family: 'Inter', system-ui, -apple-system, 'Segoe UI', Roboto, 'Helvetica Neue', Arial;
+      color:var(--white);
+      background: linear-gradient(rgba(0,0,0,0.6), rgba(0,0,0,0.6)), url('https://images.unsplash.com/photo-1558611848-73f7eb4001d0?auto=format&fit=crop&w=1600&q=80') center/cover no-repeat fixed;
+      -webkit-font-smoothing:antialiased;
+      -moz-osx-font-smoothing:grayscale;
+      overflow:hidden; /* estado inicial: sem scroll */
+      height:100vh; /* ocupa 100% da tela sem scroll */
+    }
+
+    /* Barra de progresso fake (fixed no topo) */
+    #progress-wrap{position:fixed;top:0;left:0;width:100%;height:4px;z-index:9999;pointer-events:none}
+    #progress{width:0;height:100%;background:var(--gold);transition:width 200ms linear}
+    #progress-wrap.progress-complete{opacity:0;transition:opacity .6s ease;pointer-events:none}
+
+    /* Hero (headline + vídeo) */
+    .hero{display:flex;flex-direction:column;align-items:center;justify-content:center;gap:18px;padding:22px 16px;min-height:100vh}
+    .hero.sticky-top{position:sticky;top:0;z-index:50;background:linear-gradient(0deg, rgba(10,10,10,0.6), rgba(10,10,10,0.4))}
+
+    .headline{max-width:1200px;text-align:center}
+    .headline h1{font-family:'Bebas Neue',sans-serif;font-size:clamp(28px,7vw,72px);margin:0;line-height:0.95;letter-spacing:0.02em;text-transform:uppercase;color:var(--white);}
+    .headline h1 .accent{color:var(--gold)}
+
+    /* Player 16:9 responsivo */
+    .video-wrapper{width:100%;max-width:1100px;aspect-ratio:16/9;border-radius:12px;overflow:hidden;background:#000;box-shadow:0 20px 60px rgba(0,0,0,0.6)}
+    video{width:100%;height:100%;object-fit:cover;display:block}
+
+    /* Overlay botão play (quando autoplay for bloqueado) */
+    .play-overlay{position:absolute;left:50%;top:50%;transform:translate(-50%,-50%);z-index:60;display:flex;align-items:center;justify-content:center;width:96px;height:96px;border-radius:50%;background:rgba(0,0,0,0.6);color:var(--white);font-size:36px;border:2px solid rgba(255,255,255,0.06);opacity:0;pointer-events:none}
+    .play-overlay.visible{opacity:1;pointer-events:auto}
+
+    /* Conteúdo mostrado após o delay (inicialmente oculto) */
+    .after-delay{display:none;opacity:0;transform:translateY(18px);transition:opacity .6s ease,transform .6s ease}
+    .after-delay.visible{display:block;opacity:1;transform:translateY(0)}
+
+    .container{max-width:1100px;margin:0 auto;padding:24px}
+
+    /* Logo DESAFIO */
+    .logo-box{background:var(--bg-dark-2);display:inline-block;padding:14px 22px;border-radius:8px}
+    .logo-box h2{margin:0;font-family:'Bebas Neue';font-size:36px;color:var(--gold);letter-spacing:0.03em}
+
+    /* CTA grande */
+    .cta-primary{display:inline-block;background:var(--gold);color:#000;padding:14px 22px;border-radius:12px;font-weight:700;box-shadow:0 6px 18px rgba(0,0,0,0.5);border:none;cursor:pointer;font-size:18px}
+    .cta-primary.pulse{animation:pulse 1.6s infinite}
+    @keyframes pulse{0%{transform:scale(1)}50%{transform:scale(1.03)}100%{transform:scale(1)}}
+
+    /* Formulário e card do plano */
+    .signup-section{display:flex;flex-direction:column;gap:18px;margin-top:18px}
+    .plan-card{background:var(--gray-dark);border:2px solid var(--gold);padding:16px;border-radius:10px;display:flex;justify-content:space-between;align-items:center}
+    .plan-card .price{font-weight:800;font-size:20px}
+
+    form{background:var(--gray-dark);padding:18px;border-radius:12px;border:1px solid rgba(255,255,255,0.02);display:grid;gap:12px}
+    label{font-size:13px;color:var(--muted);display:block;margin-bottom:6px}
+    input,select,textarea{background:var(--input-bg);border:1px solid var(--input-border);color:var(--white);padding:10px 12px;border-radius:8px;font-size:15px}
+    .row{display:flex;gap:12px}
+    .col{flex:1}
+    .small{flex:0 0 100px}
+
+    .payment-btn{display:inline-flex;align-items:center;gap:8px;background:#111;border-radius:8px;padding:8px 12px;border:1px solid rgba(255,255,255,0.04);cursor:pointer}
+    .final-btn{background:var(--gold);color:#000;padding:14px;border-radius:10px;border:none;font-weight:800;font-size:16px;cursor:pointer;width:100%}
+
+    .form-footer{text-align:center;font-size:12px;margin-top:6px}
+    .form-footer a{color:var(--muted);text-decoration:underline}
+
+    /* Política (seção oculta que recebe scroll suave) */
+    #politica{background:linear-gradient(180deg, rgba(10,10,10,0.9), rgba(10,10,10,0.95));color:var(--muted);padding:24px;border-top:1px solid rgba(255,255,255,0.03);margin-top:40px}
+
+    /* Mobile CTA fixo no bottom */
+    .mobile-cta{position:fixed;left:50%;transform:translateX(-50%);bottom:18px;z-index:1000;width:calc(100% - 32px);max-width:520px}
+    .mobile-cta .cta{display:block;text-align:center}
+    .mobile-cta.hidden{opacity:0;pointer-events:none;transform:translateX(-50%) translateY(10px)}
+
+    /* Estado após inscrição (thank you) */
+    .thanks{display:none;min-height:100vh;padding:40px;background:linear-gradient(rgba(0,0,0,0.6), rgba(0,0,0,0.6)), url('https://images.unsplash.com/photo-1505740420928-5e560c06d30e?auto=format&fit=crop&w=1600&q=80') center/cover no-repeat;color:var(--white)}
+    .thanks.visible{display:block}
+    .thanks .title{font-family:'Bebas Neue';font-size:40px}
+    .thanks .title .highlight{color:var(--gold)}
+
+    /* Responsividade (mobile-first) */
+    @media(min-width:480px){
+      .row{gap:12px}
+      .small{flex:0 0 120px}
+      .mobile-cta{display:none}
+    }
+    @media(min-width:768px){
+      .headline h1{font-size:clamp(36px,6vw,84px)}
+      form{max-width:600px}
+      .container{padding:32px}
+    }
+
+    /* inputs e labels pequenos */
+    .optional{font-size:11px;color:var(--muted);margin-left:8px}
+  </style>
+</head>
+<body>
+
+  <!-- Barra de progresso fake fixa no topo -->
+  <div id="progress-wrap"><div id="progress"></div></div>
+
+  <!-- HERO: Headline + Vídeo -->
+  <header class="hero" id="hero">
+    <div class="headline">
+      <h1 id="headlineText">CARREGANDO...<span class="accent"></span></h1>
+    </div>
+
+    <div class="video-wrapper">
+      <!-- Vídeo: src será setado via JS a partir do CONFIG -->
+      <video id="hero-video" playsinline muted preload="auto" webkit-playsinline></video>
+      <button id="play-overlay" class="play-overlay" aria-label="Play">▶</button>
+    </div>
+  </header>
+
+  <!-- Conteúdo revelado após o delay -->
+  <main class="after-delay" id="afterDelay">
+    <div class="container">
+      <div style="display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:12px;">
+        <div class="logo-box animate-on-show">
+          <h2>DESAFIO SB 21D</h2>
+        </div>
+        <div>
+          <button class="cta-primary cta-scroll pulse" id="top-cta">ME INSCREVER AGORA</button>
+        </div>
+      </div>
+
+      <!-- Seção de inscrição -->
+      <section id="signup-section" class="signup-section" style="margin-top:22px;">
+        <div class="plan-card animate-on-show">
+          <div>
+            <div style="font-size:14px;color:var(--muted)">Membro</div>
+            <div style="font-weight:700">Plataforma VIP</div>
+          </div>
+          <div style="text-align:right">
+            <div class="price">R$ 29,90</div>
+            <button class="payment-btn" style="margin-top:8px"><span style="font-size:18px">💳</span> Cartão</button>
+          </div>
+        </div>
+
+        <form id="signup-form" class="animate-on-show" novalidate>
+          <h3 style="margin:0 0 6px 0">ME INSCREVER AGORA</h3>
+
+          <!-- Seus Dados -->
+          <div>
+            <label>Nome Completo</label>
+            <input type="text" id="nome" required placeholder="Seu nome completo" />
+          </div>
+
+          <div>
+            <label>E-mail <span class="optional">OPCIONAL</span></label>
+            <input type="email" id="email" placeholder="seu@email.com" />
+          </div>
+
+          <div>
+            <label>Celular</label>
+            <input type="tel" id="celular" placeholder="(00) 00000-0000" maxlength="15" />
+          </div>
+
+          <div>
+            <label>Crie uma Senha para Acesso</label>
+            <input type="password" id="senha" placeholder="Senha" required />
+          </div>
+
+          <!-- Dados do Cartão -->
+          <div style="margin-top:6px"><strong style="font-size:13px">Dados do Cartão</strong></div>
+          <div>
+            <label>Nome impresso no cartão</label>
+            <input type="text" id="cartao-nome" placeholder="Como aparece no cartão" />
+          </div>
+
+          <div>
+            <label>Número do cartão</label>
+            <input type="text" id="cartao-num" placeholder="0000 0000 0000 0000" maxlength="19" />
+          </div>
+
+          <div class="row">
+            <div class="col small">
+              <label>Mês (MM)</label>
+              <input type="text" id="cartao-mes" placeholder="MM" maxlength="2" />
+            </div>
+            <div class="col small">
+              <label>Ano (AAAA)</label>
+              <input type="text" id="cartao-ano" placeholder="AAAA" maxlength="4" />
+            </div>
+            <div class="col small">
+              <label>CVV</label>
+              <input type="text" id="cartao-cvv" placeholder="CVV" maxlength="4" />
+            </div>
+          </div>
+
+          <!-- Endereço de Cobrança -->
+          <div style="margin-top:6px"><strong style="font-size:13px">Endereço de Cobrança</strong></div>
+          <div class="row">
+            <div class="col">
+              <label>CEP</label>
+              <input type="text" id="cep" placeholder="00000-000" maxlength="9" />
+            </div>
+            <div class="col">
+              <label>Número</label>
+              <input type="text" id="numero" placeholder="123" />
+            </div>
+            <div class="col">
+              <label>Complemento</label>
+              <input type="text" id="complemento" placeholder="opcional" />
+            </div>
+          </div>
+
+          <div>
+            <button type="submit" class="final-btn">FINALIZAR INSCRIÇÃO</button>
+          </div>
+
+          <div class="form-footer">
+            <a href="#politica" class="politica-link">POLÍTICA DE PRIVACIDADE</a>
+          </div>
+        </form>
+      </section>
+
+      <div style="height:40px"></div>
+    </div>
+  </main>
+
+  <!-- Botão fixo mobile para inscrever -->
+  <div class="mobile-cta" id="mobileCta">
+    <button class="cta-primary cta-scroll">ME INSCREVER AGORA</button>
+  </div>
+
+  <!-- Seção Política de Privacidade (oculta por padrão, scroll suave) -->
+  <section id="politica">
+    <div class="container">
+      <h3>Política de Privacidade</h3>
+      <p>Coleta de dados: coletamos nome, e-mail, telefone e dados de pagamento para completar a inscrição.</p>
+      <p>Uso das informações: os dados são usados para processamento de pagamento, acesso à plataforma e comunicações relacionadas ao produto.</p>
+      <p>Compartilhamento: não vendemos seus dados. Podemos compartilhar com provedores de pagamento e serviços contratados.</p>
+      <p>Direitos do usuário (LGPD): você pode solicitar acesso, correção, exclusão ou portabilidade dos dados.</p>
+      <p>Contato: contato@seudominio.com</p>
+    </div>
+  </section>
+
+  <!-- Estado 3: página de confirmação/obrigado (inicialmente oculta) -->
+  <section class="thanks" id="thanks">
+    <div class="container">
+      <div style="max-width:800px;margin:0 auto;text-align:center">
+        <h1 class="title">SUA MELHOR <span class="highlight">VERSÃO</span> COMEÇA AGORA.</h1>
+        <p style="color:var(--muted)">Acesse o Protocolo Trindade e preserve sua inscrição. O corpo que você construiu hoje é o resultado de amanhã.</p>
+
+        <div style="margin-top:18px;background:rgba(0,0,0,0.4);padding:18px;border-radius:12px;display:inline-block;width:100%;max-width:420px;">
+          <div style="text-align:left;margin-bottom:10px;color:var(--muted)">Login</div>
+          <input type="email" id="login-email" placeholder="E-mail" style="width:100%;margin-bottom:8px" />
+          <input type="password" id="login-senha" placeholder="Senha" style="width:100%;margin-bottom:12px" />
+          <button class="cta-primary" id="login-btn">ACESSAR PLATAFORMA →</button>
+        </div>
+
+        <div style="margin-top:14px;color:var(--muted)">1.235 alunos ao vivo</div>
+      </div>
+    </div>
+  </section>
+
+  <script>
+    /* CONFIGURAÇÕES CENTRAIS */
+    const CONFIG = {
+      videoUrl: "COPY-SB21D-001.mp4", // substituir pela URL real ou nome do arquivo local
+      delayEmSegundos: 45, // segundo do vídeo que dispara o delay
+      progressBarDuration: 60, // duração em segundos (padrão)
+      precoPlano: "R$ 29,90",
+      nomePlano: "Membro Plataforma VIP",
+      nomeProduto: "DESAFIO SB 21D",
+      politicaPrivacidadeUrl: "#politica" // ou URL externa
+    };
+
+    /* HEADLINES para teste A/B */
+    const HEADLINES = [
+      "Método 100% comprovado de emagrecer em casa!",
+      "Finalmente uma técnica infalível para ter um corpo sarado!",
+      "Tática comprovada para perder peso sem ir à academia!",
+      "Como criar mais músculos com apenas 3 horas semanais de treino!",
+      "Única forma comprovada de perder peso após a gravidez!",
+      "Manual do emagrecimento: aprenda a perder peso de forma tranquila e saudável!",
+      "Aplique essa receita secreta e emagreça mais rápido!",
+      "Revelado o segredo para emagrecer sem ficar horas treinando!",
+      "Descubra como perder peso de forma fácil sem mudar sua alimentação!",
+      "Perca 5kg em 4 semanas com esses 4 passos simples!",
+      "Use a mesma técnica que eu usei para perder 8kg em 3 semanas!",
+      "Tenha o corpo dos seus sonhos de forma rápida e barata!",
+      "Acelere o seu emagrecimento usando essa metodologia comprovada por 10.000 pessoas!",
+      "10 receitas que você pode fazer para emagrecer sem fazer exercícios físicos!",
+      "As 5 maneiras mais rápidas de ter um corpo sarado!",
+      "10 formas de emagrecer sem tirar o chocolate da alimentação!",
+      "Conheça esse truque para ter o corpo dos sonhos no verão!",
+      "Veja como eliminar a gordura com essa simples técnica!",
+      "Descubra como emagrecer 7kg para ficar no shape no verão!",
+      "Como Emagrecer em Casa: O Guia Definitivo para Uma Vida Mais Leve",
+      "Transforme Seu Corpo em Uma Máquina de Queimar Gordura"
+    ];
+
+    const AB_KEY = 'sb21d_abtest_v1';
+
+    // Inicializa headline A/B (sorteio e persistência no localStorage)
+    function initHeadline(){
+      let stored = localStorage.getItem(AB_KEY);
+      let data;
+      if(stored){
+        try{ data = JSON.parse(stored); }catch(e){ stored=null }
+      }
+      if(!stored){
+        const idx = Math.floor(Math.random()*HEADLINES.length);
+        data = { headlineIndex: idx, headlineText: HEADLINES[idx], timestamp: new Date().toISOString(), conversao: false };
+        localStorage.setItem(AB_KEY, JSON.stringify(data));
+      }
+      // Mostrar em CAIXA ALTA
+      const h = document.getElementById('headlineText');
+      h.textContent = (data.headlineText || '').toUpperCase();
+      // Log simples
+      console.log('A/B Test - Headline ativa:', data.headlineIndex, '-', data.headlineText, 'conversao:', data.conversao);
+    }
+
+    // Atualiza conversão no localStorage
+    function markConversao(){
+      let stored = localStorage.getItem(AB_KEY);
+      if(!stored) return;
+      try{
+        const data = JSON.parse(stored);
+        data.conversao = true;
+        data.conversionTimestamp = new Date().toISOString();
+        localStorage.setItem(AB_KEY, JSON.stringify(data));
+        console.log('A/B Test atualizado (conversao):', data);
+      }catch(e){console.warn(e)}
+    }
+
+    /* PROGRESS BAR ANIMAÇÃO via requestAnimationFrame */
+    const progressEl = document.getElementById('progress');
+    const progressWrap = document.getElementById('progress-wrap');
+    const phase1ms = 2000; // 0-2s: rápido até 60%
+    const phaseEndMs = CONFIG.delayEmSegundos * 1000; // até o momento do delay
+    let rafId = null;
+    let startTs = null;
+
+    function easeInOut(t){ return t<.5 ? 2*t*t : -1 + (4 - 2*t) * t }
+
+    function tick(ts){
+      if(!startTs) startTs = ts;
+      const elapsed = ts - startTs;
+      if(elapsed <= phase1ms){
+        const p = easeInOut(Math.min(1, elapsed/phase1ms)) * 0.6; // 0-60%
+        progressEl.style.width = (p*100) + '%';
+      }else if(elapsed < phaseEndMs){
+        const r = (elapsed - phase1ms) / Math.max(1, (phaseEndMs - phase1ms));
+        const p = 0.6 + easeInOut(Math.min(1, r)) * (0.95 - 0.6); // 60-95%
+        progressEl.style.width = (p*100) + '%';
+      }else{
+        progressEl.style.width = (95) + '%';
+      }
+      rafId = requestAnimationFrame(tick);
+    }
+
+    // Completa a barra para 100% e esconde com fadeout
+    function completeProgress(){
+      cancelAnimationFrame(rafId);
+      progressEl.style.transition = 'width .5s cubic-bezier(.22,.91,.21,1), opacity .5s ease';
+      progressEl.style.width = '100%';
+      progressWrap.classList.add('progress-complete');
+      setTimeout(()=>{ try{ progressWrap.style.display='none' }catch(e){} },700);
+    }
+
+    /* LÓGICA DO VÍDEO e TRANSIÇÃO DO DELAY */
+    const video = document.getElementById('hero-video');
+    const playOverlay = document.getElementById('play-overlay');
+    let delayTriggered = false;
+
+    // seta src do vídeo a partir do CONFIG
+    video.src = CONFIG.videoUrl;
+    video.setAttribute('playsinline','');
+    video.muted = true;
+    video.autoplay = true;
+
+    // tenta autoplay; se bloqueado, mostra overlay
+    function tryAutoplay(){
+      video.play().then(()=>{
+        playOverlay.classList.remove('visible');
+      }).catch(()=>{
+        playOverlay.classList.add('visible');
+      });
+    }
+
+    playOverlay.addEventListener('click', ()=>{
+      video.muted = false; // usuário quer ouvir
+      video.play().then(()=>{ playOverlay.classList.remove('visible'); }).catch(()=>{});
+    });
+
+    // Verifica tempo do vídeo para disparar o delay
+    function onVideoTime(){
+      if(delayTriggered) return;
+      try{
+        if(video.currentTime >= CONFIG.delayEmSegundos){
+          delayTriggered = true;
+          onDelayReached();
+        }
+      }catch(e){}
+    }
+
+    // Fallback: se o vídeo não carregar, usa timeout baseado no CONFIG
+    let fallbackTimer = setTimeout(()=>{
+      if(!delayTriggered){ delayTriggered = true; onDelayReached(); }
+    }, (CONFIG.delayEmSegundos + 5) * 1000);
+
+    video.addEventListener('timeupdate', onVideoTime);
+    video.addEventListener('play', ()=>{ if(playOverlay.classList.contains('visible')) playOverlay.classList.remove('visible'); });
+    video.addEventListener('loadeddata', ()=>{ tryAutoplay(); });
+
+    // Ação quando o delay ocorre: remove overflow, revela conteúdo, completa barra
+    function onDelayReached(){
+      // completar barra
+      completeProgress();
+
+      // permitir scroll (remove overflow:hidden e altura fixa)
+      document.body.style.overflow = '';
+      document.body.style.height = '';
+
+      // manter hero no topo (sticky) e revelar o restante
+      document.querySelector('.hero').classList.add('sticky-top');
+      const after = document.getElementById('afterDelay');
+      after.classList.add('visible');
+
+      // animação de entrada para elementos do Estado 2
+      document.querySelectorAll('.animate-on-show').forEach((el, i)=>{
+        el.style.opacity = 0; el.style.transform = 'translateY(10px)'; el.style.transition = 'opacity .5s ease, transform .5s ease';
+        setTimeout(()=>{ el.style.opacity = 1; el.style.transform='translateY(0)'; }, 120 + i*80);
+      });
+
+      // remove fallback timer
+      clearTimeout(fallbackTimer);
+    }
+
+    // Inicia animação da barra quando a página carrega
+    window.addEventListener('load', ()=>{
+      requestAnimationFrame(tick);
+      initHeadline();
+    });
+
+    /* MÁSCARAS NATIVAS EM JS PURO */
+    function maskOnlyDigits(v){ return v.replace(/\D/g,''); }
+
+    // Celular (00) 00000-0000
+    const celular = document.getElementById('celular');
+    celular && celular.addEventListener('input', (e)=>{
+      let v = maskOnlyDigits(e.target.value).slice(0,11);
+      if(v.length <= 2) e.target.value = '(' + v;
+      else if(v.length <= 6) e.target.value = '(' + v.slice(0,2) + ') ' + v.slice(2);
+      else if(v.length <= 10) e.target.value = '(' + v.slice(0,2) + ') ' + v.slice(2,7) + '-' + v.slice(7);
+      else e.target.value = '(' + v.slice(0,2) + ') ' + v.slice(2,7) + '-' + v.slice(7,11);
+    });
+
+    // Cartão 0000 0000 0000 0000
+    const cardNum = document.getElementById('cartao-num');
+    cardNum && cardNum.addEventListener('input', (e)=>{
+      let v = maskOnlyDigits(e.target.value).slice(0,16);
+      let parts = [];
+      for(let i=0;i<v.length;i+=4) parts.push(v.substr(i,4));
+      e.target.value = parts.join(' ');
+    });
+
+    // CEP 00000-000
+    const cep = document.getElementById('cep');
+    cep && cep.addEventListener('input', (e)=>{
+      let v = maskOnlyDigits(e.target.value).slice(0,8);
+      if(v.length > 5) e.target.value = v.slice(0,5) + '-' + v.slice(5);
+      else e.target.value = v;
+    });
+
+    // Mês (MM) limitar entre 01-12
+    const mes = document.getElementById('cartao-mes');
+    mes && mes.addEventListener('input', (e)=>{
+      let v = maskOnlyDigits(e.target.value).slice(0,2);
+      if(v.length === 1 && v !== '0' && v !== '1') v = '0'+v; // tenta padronizar
+      if(v.length === 2){ let num = parseInt(v,10); if(num < 1) v='01'; if(num>12) v='12' }
+      e.target.value = v;
+    });
+
+    // Ano (AAAA) - apenas dígitos
+    const ano = document.getElementById('cartao-ano');
+    ano && ano.addEventListener('input', (e)=>{ e.target.value = maskOnlyDigits(e.target.value).slice(0,4); });
+
+    // Evita envio real do formulário; atualiza localStorage e mostra Estado 3
+    const form = document.getElementById('signup-form');
+    form && form.addEventListener('submit', (e)=>{
+      e.preventDefault();
+      // Atualiza conversão no AB test
+      markConversao();
+
+      // Mostrar Estado 3 (Obrigado) simples
+      document.getElementById('afterDelay').style.display = 'none';
+      document.getElementById('hero').style.display = 'none';
+      const thanks = document.getElementById('thanks');
+      thanks.classList.add('visible');
+      // rola para topo
+      window.scrollTo({top:0,behavior:'smooth'});
+    });
+
+    // Smooth scroll ao clicar em botões CTA
+    document.querySelectorAll('.cta-scroll').forEach(btn=> btn.addEventListener('click', ()=>{
+      const target = document.getElementById('signup-section');
+      if(target){ target.scrollIntoView({behavior:'smooth', block:'start'}); }
+    }));
+
+    // Esconder o botão mobile CTA quando o formulário estiver visível
+    const mobileCta = document.getElementById('mobileCta');
+    const signupSection = document.getElementById('signup-section');
+    if(mobileCta && signupSection){
+      const io = new IntersectionObserver((entries)=>{
+        entries.forEach(en=>{
+          if(en.isIntersecting) mobileCta.classList.add('hidden'); else mobileCta.classList.remove('hidden');
+        });
+      }, {threshold:0.5});
+      io.observe(signupSection);
+    }
+
+    // Política de privacidade: abre anchor interno ou nova aba se configurado
+    document.querySelectorAll('.politica-link').forEach(a=> a.addEventListener('click', (ev)=>{
+      ev.preventDefault();
+      if(CONFIG.politicaPrivacidadeUrl && CONFIG.politicaPrivacidadeUrl !== '#politica'){
+        window.open(CONFIG.politicaPrivacidadeUrl, '_blank');
+      }else{
+        document.getElementById('politica').scrollIntoView({behavior:'smooth'});
+      }
+    }));
+
+    // Pequeno fallback para ativar autoplay attempt ao clicar na página
+    document.addEventListener('click', ()=>{ tryAutoplay(); }, {once:true});
+
+  </script>
+</body>
+</html>
