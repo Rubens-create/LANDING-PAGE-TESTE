@@ -10,596 +10,22 @@
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Inter:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
 
-    <style>
-        :root {
-            --color-bg: #0a0a0a;
-            --color-primary: #d4af37; /* Atualizado para o dourado do template */
-            --color-primary-hover: #b8972e;
-            --color-text: #FFFFFF;
-            --color-text-muted: #a1a1aa; /* zinc-400 */
-            
-            /* Glassmorphism Variables */
-            --glass-bg: rgba(0, 0, 0, 0.6);
-            --glass-border: #27272a; /* zinc-800 */
-            --input-bg: #18181b; /* zinc-900 */
-            
-            --font-headings: 'Bebas Neue', sans-serif;
-            --font-body: 'Inter', sans-serif;
-        }
-
-        /* Resets & Base Variables */
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-        }
-
-        html {
-            scroll-behavior: smooth;
-        }
-
-        body {
-            font-family: var(--font-body);
-            background-color: var(--color-bg);
-            color: var(--color-text);
-            overflow-x: hidden;
-            line-height: 1.5;
-        }
-
-        /* Utils for Background Image */
-        .fixed { position: fixed; }
-        .inset-0 { top: 0; right: 0; bottom: 0; left: 0; }
-        .z-\[-1\] { z-index: -1; }
-        .bg-cover { background-size: cover; }
-        .bg-center { background-position: center; }
-        .opacity-20 { opacity: 0.2; }
-
-        body.locked {
-            overflow-y: hidden;
-            height: 100vh;
-        }
-
-        h1, h2, h3, h4, h5, h6 {
-            letter-spacing: normal;
-        }
-
-        ul { list-style: none; }
-        a { text-decoration: none; }
-        .hidden { display: none !important; }
-        
-        /* Main Container */
-        .container {
-            max-width: 1200px;
-            margin: 0 auto;
-            padding: 0 20px;
-        }
-
-        /* Top Section: Video & Headline */
-        .hero {
-            min-height: 100vh;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            justify-content: center;
-            padding-top: 2rem;
-            padding-bottom: 2rem;
-        }
-
-        .headline {
-            font-family: var(--font-headings);
-            font-size: 2.5rem;
-            text-align: center;
-            margin-bottom: 1.5rem;
-            max-width: 900px;
-            text-transform: uppercase;
-            line-height: 1.1;
-            text-shadow: 0 4px 10px rgba(0,0,0,0.5);
-            padding: 0 10px;
-        }
-
-        .video-wrapper {
-            width: 100%;
-            max-width: 800px;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-        }
-
-        .video-container {
-            width: 100%;
-            aspect-ratio: 16 / 9;
-            background: #000;
-            position: relative;
-            border-radius: 8px;
-            overflow: hidden;
-            box-shadow: 0 20px 40px rgba(0,0,0,0.8);
-            border: 1px solid var(--glass-border);
-        }
-
-        video {
-            width: 100%;
-            height: 100%;
-            object-fit: contain;
-        }
-
-        .play-overlay {
-            position: absolute;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            background: rgba(0,0,0,0.6);
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            cursor: pointer;
-            z-index: 10;
-        }
-
-        .play-overlay svg {
-            width: 80px;
-            height: 80px;
-            fill: var(--color-primary);
-            transition: transform 0.2s;
-        }
-
-        .play-overlay:hover svg {
-            transform: scale(1.1);
-        }
-
-        /* Fake Progress Bar - Movida para debaixo do vídeo e com dobro da grossura (8px) */
-        .progress-bar-container {
-            width: 100%;
-            height: 8px; /* Dobro de 4px */
-            background-color: var(--glass-border);
-            border-radius: 8px;
-            margin-top: 15px;
-            overflow: hidden;
-        }
-
-        #progress-bar {
-            height: 100%;
-            background-color: var(--color-primary);
-            width: 0%;
-            border-radius: 8px;
-            transition: width 0.1s linear, opacity 0.5s ease;
-        }
-
-        /* Estado 2: Revealed Content */
-        #estado2 {
-            padding-bottom: 4rem;
-            opacity: 0;
-            transform: translateY(30px);
-            transition: opacity 0.8s ease, transform 0.8s ease;
-        }
-
-        #estado2.show {
-            opacity: 1;
-            transform: translateY(0);
-        }
-
-        .logo {
-            font-family: var(--font-headings);
-            font-size: 4rem;
-            text-align: center;
-            margin: 2rem 0;
-            color: var(--color-primary);
-            text-shadow: 2px 2px 4px rgba(0,0,0,0.8);
-        }
-
-        .logo span {
-            background-color: var(--color-bg);
-            padding: 0 10px;
-            border-radius: 4px;
-        }
-
-        /* CTA Main Viewport Button */
-        .cta-btn-scroll {
-            display: block;
-            width: 100%;
-            max-width: 400px;
-            margin: 0 auto 3rem auto;
-            background: linear-gradient(to right, #d4af37, #f3e5ab, #d4af37);
-            background-size: 200% auto;
-            color: #000;
-            font-family: var(--font-body);
-            font-weight: 900;
-            font-size: 1.2rem;
-            text-align: center;
-            padding: 1.2rem;
-            border-radius: 12px;
-            border: none;
-            cursor: pointer;
-            text-transform: uppercase;
-            box-shadow: 0 10px 20px rgba(212, 175, 55, 0.2);
-            animation: pulse-gold 2s infinite, shine 3s linear infinite;
-            transition: all 0.3s;
-        }
-
-        .cta-btn-scroll:hover {
-            transform: translateY(-2px) scale(1.02);
-            box-shadow: 0 15px 25px rgba(212, 175, 55, 0.3);
-        }
-
-        @keyframes pulse-gold {
-            0% { box-shadow: 0 0 0 0 rgba(212, 175, 55, 0.7); }
-            70% { box-shadow: 0 0 0 15px rgba(212, 175, 55, 0); }
-            100% { box-shadow: 0 0 0 0 rgba(212, 175, 55, 0); }
-        }
-
-        @keyframes shine {
-            to { background-position: 200% center; }
-        }
-
-        #fixed-cta {
-            position: fixed;
-            bottom: 20px;
-            left: 50%;
-            transform: translateX(-50%);
-            z-index: 1000;
-            width: 90%;
-            max-width: 400px;
-            transition: opacity 0.3s, transform 0.3s;
-        }
-
-        /* Glassmorphism Checkout Form (Based on React Layout) */
-        .checkout-title {
-            text-align: center;
-            margin-bottom: 1.5rem;
-        }
-        .checkout-title h1 {
-            font-size: 1.875rem; /* 3xl */
-            font-weight: 900;
-            font-family: var(--font-body);
-            color: #fff;
-        }
-
-        .glass-panel {
-            background-color: var(--glass-bg);
-            backdrop-filter: blur(12px);
-            -webkit-backdrop-filter: blur(12px);
-            border: 1px solid var(--glass-border);
-            border-radius: 1rem; /* 2xl */
-            padding: 1.5rem; /* 6 */
-            box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.5);
-            max-width: 36rem; /* max-w-xl */
-            margin: 0 auto;
-            position: relative;
-            overflow: hidden;
-        }
-
-        /* Product Header */
-        .product-header {
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
-            margin-bottom: 1rem;
-        }
-
-        .product-info-left {
-            display: flex;
-            align-items: center;
-            gap: 0.75rem;
-        }
-
-        .product-icon-box {
-            width: 2.5rem; /* 10 */
-            height: 2.5rem;
-            border-radius: 0.5rem;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            border: 1px solid rgba(161, 98, 7, 0.5); /* border-yellow-700/50 */
-            background-color: rgba(113, 63, 18, 0.3); /* bg-yellow-900/30 */
-        }
-
-        .product-titles p {
-            font-size: 0.875rem; /* text-sm */
-            font-weight: 700;
-            color: #fff;
-        }
-        .product-titles small {
-            font-size: 0.75rem;
-            color: var(--color-text-muted);
-        }
-
-        .product-price-right {
-            font-weight: 700;
-            font-size: 0.875rem;
-        }
-
-        /* Total Section */
-        .total-section {
-            border-top: 1px solid var(--glass-border);
-            padding-top: 1rem;
-            margin-bottom: 1.5rem;
-            display: flex;
-            justify-content: space-between;
-            align-items: flex-end;
-        }
-        .total-section .total-label {
-            font-size: 0.75rem;
-            font-weight: 700;
-            color: var(--color-text-muted);
-        }
-        .total-section .total-value {
-            font-size: 1.5rem;
-            font-weight: 900;
-            color: #fff;
-        }
-
-        /* Method Tabs */
-        .method-tabs {
-            display: flex;
-            gap: 0.5rem;
-            margin-bottom: 1.5rem;
-        }
-
-        .tab-btn {
-            flex: 1;
-            padding: 0.75rem;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            gap: 0.5rem;
-            border-width: 2px;
-            border-style: solid;
-            font-weight: 700;
-            border-radius: 0.75rem;
-            transition: all 0.2s;
-            cursor: pointer;
-            font-family: var(--font-body);
-            background: transparent;
-        }
-
-        .tab-btn.active {
-            border-color: var(--color-primary);
-            background-color: rgba(212, 175, 55, 0.1);
-            color: var(--color-primary);
-        }
-
-        .tab-btn:not(.active) {
-            border-color: var(--glass-border);
-            color: var(--color-text-muted);
-        }
-
-        .tab-btn:not(.active):hover {
-            border-color: #52525b; /* zinc-600 */
-        }
-
-        /* Form Fields */
-        .form-section {
-            margin-bottom: 1rem;
-        }
-
-        .section-title {
-            font-size: 0.875rem;
-            font-weight: 700;
-            color: #d4d4d8; /* zinc-300 */
-            border-bottom: 1px solid var(--glass-border);
-            padding-bottom: 0.5rem;
-            margin-bottom: 1rem;
-        }
-
-        .input-group {
-            margin-bottom: 1rem;
-        }
-
-        .input-row {
-            display: grid;
-            grid-template-columns: 1fr 1fr;
-            gap: 1rem;
-            margin-bottom: 1rem;
-        }
-        
-        .input-row-3 {
-            display: grid;
-            grid-template-columns: 1fr 1fr 1.5fr;
-            gap: 1rem;
-            margin-bottom: 1rem;
-        }
-
-        input {
-            width: 100%;
-            background-color: var(--input-bg);
-            border: 1px solid var(--glass-border);
-            border-radius: 0.5rem; /* rounded-lg */
-            padding: 0.75rem 1rem;
-            color: #fff;
-            font-family: var(--font-body);
-            font-size: 0.875rem;
-            transition: border-color 0.2s;
-        }
-
-        input:focus {
-            outline: none;
-            border-color: var(--color-primary);
-        }
-
-        input::placeholder {
-            color: #71717a; /* zinc-500 */
-        }
-
-        .submit-btn {
-            width: 100%;
-            background: linear-gradient(to right, #d4af37, #f3e5ab, #d4af37);
-            background-size: 200% auto;
-            color: #000;
-            font-weight: 900;
-            text-transform: uppercase;
-            font-size: 0.875rem;
-            border-radius: 0.75rem; /* rounded-xl */
-            padding: 1rem;
-            border: none;
-            cursor: pointer;
-            margin-top: 0.5rem;
-            box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1);
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            gap: 0.5rem;
-            font-family: var(--font-body);
-            transition: transform 0.1s, background-position 3s linear;
-        }
-
-        .submit-btn:hover {
-            transform: scale(1.02);
-            background-position: right center;
-        }
-
-        .submit-btn:active {
-            transform: scale(0.98);
-        }
-
-        .security-badge {
-            text-align: center;
-            color: #52525b; /* zinc-600 */
-            font-size: 0.625rem; /* 10px */
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            gap: 0.5rem;
-            margin-top: 1.5rem;
-        }
-
-        /* Footer Links */
-        .footer-links {
-            text-align: center;
-            margin-top: 30px;
-            font-size: 0.85rem;
-            font-family: var(--font-body);
-        }
-        .footer-links a {
-            color: var(--color-text-muted);
-            text-decoration: underline;
-        }
-        .footer-links a:hover {
-            color: var(--color-primary);
-        }
-
-        /* Modal Politica */
-        #politica-section {
-            max-width: 800px;
-            margin: 40px auto;
-            padding: 30px;
-            background-color: var(--glass-bg);
-            border-radius: 12px;
-            border: 1px solid var(--glass-border);
-            display: none;
-            font-family: var(--font-body);
-        }
-        #politica-section h2 { color: var(--color-primary); margin-bottom: 20px; font-family: var(--font-headings); font-size: 2rem;}
-        #politica-section p, #politica-section ul { color: #ccc; margin-bottom: 15px; }
-        #politica-section ul { list-style: disc; margin-left: 20px; }
-
-        /* Estado 3: Post-purchase */
-        #estado3 {
-            display: none;
-            min-height: 100vh;
-            flex-direction: column;
-            justify-content: center;
-            align-items: center;
-            padding: 20px;
-            text-align: center;
-            background-color: rgba(0,0,0,0.6);
-            font-family: var(--font-body);
-        }
-
-        #estado3 h1 {
-            font-size: 3rem;
-            font-family: var(--font-headings);
-            max-width: 900px;
-            margin-bottom: 1rem;
-        }
-
-        #estado3 p.subtext {
-            font-size: 1.1rem;
-            max-width: 600px;
-            margin-bottom: 3rem;
-            color: var(--color-text-muted);
-        }
-
-        .login-box {
-            background-color: var(--glass-bg);
-            backdrop-filter: blur(12px);
-            padding: 30px;
-            border-radius: 1rem;
-            width: 100%;
-            max-width: 400px;
-            border: 1px solid var(--glass-border);
-        }
-
-        .login-box h3 {
-            font-size: 1.5rem;
-            font-family: var(--font-headings);
-            margin-bottom: 1.5rem;
-            color: #fff;
-            letter-spacing: 1px;
-        }
-
-        .login-box .submit-btn {
-            margin-top: 1.5rem;
-        }
-
-        .counter {
-            margin-top: 20px;
-            display: inline-flex;
-            align-items: center;
-            gap: 10px;
-            background: rgba(212, 175, 55, 0.1);
-            padding: 8px 15px;
-            border-radius: 50px;
-            border: 1px solid rgba(212, 175, 55, 0.3);
-            color: var(--color-primary);
-            font-weight: 700;
-            font-size: 0.85rem;
-        }
-
-        .dot {
-            width: 8px;
-            height: 8px;
-            background-color: #ef4444; /* red-500 */
-            border-radius: 50%;
-            animation: pulse-dot 1.5s infinite;
-        }
-
-        @keyframes pulse-dot {
-            0% { transform: scale(1); opacity: 1; }
-            50% { transform: scale(1.5); opacity: 0.5; }
-            100% { transform: scale(1); opacity: 1; }
-        }
-
-        /* Responsive Breakpoints */
-        @media (max-width: 768px) {
-            .headline { font-size: 1.8rem; }
-            .logo { font-size: 3rem; }
-            .input-row, .input-row-3 { grid-template-columns: 1fr; gap: 0; }
-            #estado3 h1 { font-size: 2.5rem; }
-        }
-
-        @media (max-width: 480px) {
-            .container { padding: 0 10px; }
-            .headline { font-size: 1.4rem; }
-            .glass-panel { border-radius: 0; border-left: none; border-right: none; }
-        }
-
-    </style>
+    <!-- External CSS -->
+    <link rel="stylesheet" href="styles.css">
 </head>
 <body class="locked">
-    
-    <div class="fixed inset-0 z-[-1] bg-cover bg-center opacity-20" style="background-image: url(&quot;https://images.unsplash.com/photo-1534438327276-14e5300c3a48&quot;);"></div>
 
+    <!-- CONFIGURAÇÕES CENTRALIZADAS -->
     <script>
-        // CONFIGURAÇÕES CENTRALIZADAS
         const CONFIG = {
             videoUrl: "COPY-SB21D-001.mp4",
             delayEmSegundos: 45,
-            precoPlano: "R$ 29,90",
-            nomePlano: "Membro Plataforma VIP",
-            nomeProduto: "DESAFIO SB 21D",
             politicaPrivacidadeUrl: "#politica-section"
         };
     </script>
+    
+    <!-- Background estático do template -->
+    <div class="fixed inset-0 z-[-1] bg-cover bg-center opacity-20" style="background-image: url('https://images.unsplash.com/photo-1534438327276-14e5300c3a48');"></div>
 
     <!-- ESTADO 1 & 2 WRAPPER -->
     <div id="main-content">
@@ -620,7 +46,7 @@
                         </video>
                     </div>
 
-                    <!-- Barra de Progresso Fake Movida para ca -->
+                    <!-- Barra de Progresso Fake -->
                     <div class="progress-bar-container">
                         <div id="progress-bar"></div>
                     </div>
@@ -633,110 +59,42 @@
                     <span>DESAFIO SB 21D</span>
                 </div>
 
-                <div class="checkout-title">
-                    <h1>Finalize seu <span style="color: var(--color-primary)">Pedido</span></h1>
+                <div class="form-title">
+                    <h1>ME INSCREVER <span style="color: var(--color-primary)">AGORA</span></h1>
                 </div>
 
                 <!-- Botão Scroll só para mobile se form não estiver na tela -->
                 <button id="fixed-cta" class="cta-btn-scroll hidden" onclick="scrollToForm()">ME INSCREVER AGORA</button>
 
-                <div id="checkout-section" class="glass-panel">
+                <div id="subscription-section" class="glass-panel">
                     
-                    <!-- Produto Principal -->
-                    <div class="product-header">
-                        <div class="product-info-left">
-                            <div class="product-icon-box">
-                                <!-- SVG Monitor Play -->
-                                <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="color: var(--color-primary);"><rect width="20" height="14" x="2" y="3" rx="2"/><path d="M8 21h8"/><path d="M12 17v4"/><path d="m10 8 6 4-6 4Z"/></svg>
-                            </div>
-                            <div class="product-titles">
-                                <p id="plan-name">Membro Plataforma VIP</p>
-                                <small>Assinatura Mensal</small>
-                            </div>
-                        </div>
-                        <div class="product-price-right">
-                            <span id="plan-price">R$ 29,90</span>
-                        </div>
-                    </div>
-
-                    <!-- Total A Pagar -->
-                    <div class="total-section">
-                        <p class="total-label">Total a pagar hoje:</p>
-                        <p class="total-value" id="plan-total">R$ 29,90</p>
-                    </div>
-
-                    <!-- Tabs de Pagamento -->
-                    <div class="method-tabs">
-                        <button type="button" class="tab-btn active" id="tab-cartao">
-                            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect width="20" height="14" x="2" y="5" rx="2"/><line x1="2" x2="22" y1="10" y2="10"/></svg>
-                            Cartão
-                        </button>
-                        <!-- Pix tab apenas figurativa ja q pediram checkout igual -->
-                        <button type="button" class="tab-btn" id="tab-pix">
-                            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect width="18" height="18" x="3" y="3" rx="2" ry="2"/><path d="M8 12h8"/><path d="M12 8v8"/></svg>
-                            PIX
-                        </button>
-                    </div>
-
                     <form id="subscription-form">
                         
-                        <!-- Dados Pessoais -->
+                        <!-- Dados Pessoais de Inscrição -->
                         <div class="form-section">
-                            <h3 class="section-title">Seus Dados</h3>
+                            <h3 class="section-title">Preencha seus Dados Iniciais</h3>
                             <div class="input-group">
                                 <input type="text" id="nome" name="nome" placeholder="Nome Completo" required>
                             </div>
                             <div class="input-row">
                                 <input type="email" id="email" name="email" placeholder="E-mail" required>
-                                <input type="text" id="cpf" name="cpf" placeholder="CPF/CNPJ" required maxlength="14" oninput="mascaraCPF(this)">
-                            </div>
-                            <div class="input-group">
                                 <input type="tel" id="celular" name="celular" placeholder="Celular (com DDD)" maxlength="15" required>
                             </div>
                             <div class="input-group">
-                                <input type="password" id="senha" name="senha" placeholder="Crie uma Senha para Acesso" required minlength="6" style="border-color: rgba(234, 179, 8, 0.3);">
-                            </div>
-                        </div>
-
-                        <!-- Dados do Cartão (Só exibe se Cartão ativo. Mas manteremos default ativo) -->
-                        <div id="cartao-fields">
-                            <div class="form-section">
-                                <h3 class="section-title">Dados do Cartão</h3>
-                                <div class="input-group">
-                                    <input type="text" id="nome-cartao" name="nome-cartao" placeholder="Nome impresso no cartão" required>
-                                </div>
-                                <div class="input-group">
-                                    <input type="text" id="num-cartao" name="num-cartao" placeholder="Número do cartão" maxlength="19" required style="letter-spacing: 0.1em;">
-                                </div>
-                                <div class="input-row-3">
-                                    <input type="text" id="mes-cartao" name="mes-cartao" placeholder="Mês (MM)" maxlength="2" required style="text-align: center;">
-                                    <input type="text" id="ano-cartao" name="ano-cartao" placeholder="Ano (AAAA)" maxlength="4" required style="text-align: center;">
-                                    <input type="text" id="cvv" name="cvv" placeholder="CVV" maxlength="4" required style="text-align: center;">
-                                </div>
-                            </div>
-
-                            <div class="form-section">
-                                <h3 class="section-title" style="padding-top: 0.5rem;">Endereço de Cobrança</h3>
-                                <div class="input-row">
-                                    <input type="text" id="cep" name="cep" placeholder="CEP" maxlength="9" required>
-                                    <input type="text" id="numero" name="numero" placeholder="Número" required>
-                                </div>
-                                <div class="input-group">
-                                    <input type="text" id="complemento" name="complemento" placeholder="Complemento (opcional)">
-                                </div>
+                                <input type="password" id="senha" name="senha" placeholder="Crie uma Senha para seu Acesso" required minlength="6" style="border-color: rgba(234, 179, 8, 0.3);">
                             </div>
                         </div>
 
                         <button type="submit" class="submit-btn" id="btn-finalizar">
-                            PAGAR R$ 29,90
+                            GARANTIR MINHA VAGA
                             <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect width="18" height="11" x="3" y="11" rx="2" ry="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>
                         </button>
                     </form>
-                </div> <!-- End checkout form -->
+                </div> <!-- End form -->
 
                 <div class="security-badge">
                     <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/><path d="m9 12 2 2 4-4"/></svg>
-                    <p>Pagamento Seguro processado com privacidade</p>
+                    <p>Inscrição Segura e com privacidade</p>
                 </div>
 
                 <div class="footer-links">
@@ -750,7 +108,6 @@
                     <ul>
                         <li>Coleta de Dados de forma segura.</li>
                         <li>Uso para processamentos da plataforma.</li>
-                        <li>Não compartilhamos nem armazenamos cartões puros.</li>
                     </ul>
                 </div>
             </section>
@@ -770,7 +127,7 @@
             <div class="input-group">
                 <input type="password" placeholder="Senha" id="login-senha">
             </div>
-            <button class="submit-btn">ACESSAR PLATAFORMA &rarr;</button>
+            <button class="submit-btn" onclick="location.reload()">ACESSAR PLATAFORMA &rarr;</button>
         </div>
 
         <div class="counter">
@@ -779,210 +136,7 @@
         </div>
     </div>
 
-    <!-- MAIN JAVASCRIPT LOGIC -->
-    <script>
-        document.getElementById('main-video').src = CONFIG.videoUrl;
-
-        // --- SISTEMA DE TESTE A/B HEADLINES ---
-        const headlinesList = [
-            "Método 100% comprovado de emagrecer em casa!",
-            "Finalmente uma técnica infalível para ter um corpo sarado!",
-            "Tática comprovada para perder peso sem ir à academia!",
-            "Como criar mais músculos com apenas 3 horas semanais de treino!",
-            "Única forma comprovada de perder peso após a gravidez!",
-            "Manual do emagrecimento: aprenda a perder peso de forma tranquila e saudável!",
-            "Aplique essa receita secreta e emagreça mais rápido!",
-            "Revelado o segredo para emagrecer sem ficar horas treinando!",
-            "Descubra como perder peso de forma fácil sem mudar sua alimentação!",
-            "Perca 5kg em 4 semanas com esses 4 passos simples!",
-            "Use a mesma técnica que eu usei para perder 8kg em 3 semanas!"
-        ];
-
-        function initHeadline() {
-            const randomIndex = Math.floor(Math.random() * headlinesList.length);
-            const hl = headlinesList[randomIndex];
-            document.getElementById('main-headline').innerText = hl;
-        }
-        initHeadline();
-
-        // --- CONTROLE DE VÍDEO & DELAY ---
-        const video = document.getElementById('main-video');
-        const overlayButton = document.getElementById('play-btn-overlay');
-        let delayDisparado = false;
-        
-        video.muted = true;
-        const tryAutoplay = async () => {
-            try {
-                await video.play();
-                overlayButton.classList.add('hidden');
-            } catch (err) {
-                overlayButton.classList.remove('hidden');
-            }
-        }
-        tryAutoplay();
-
-        overlayButton.addEventListener('click', () => {
-            video.muted = false;
-            video.play();
-            overlayButton.classList.add('hidden');
-        });
-
-        // Trigger delay check
-        video.addEventListener('timeupdate', () => {
-            if (!delayDisparado && video.currentTime >= CONFIG.delayEmSegundos) dispararDelay();
-        });
-
-        window.setInterval(() => {
-            if(!delayDisparado && video.currentTime >= CONFIG.delayEmSegundos) dispararDelay();
-        }, 1000);
-
-        function dispararDelay() {
-            delayDisparado = true;
-            document.body.classList.remove('locked');
-            const estado2 = document.getElementById('estado2');
-            estado2.classList.remove('hidden');
-            setTimeout(() => { estado2.classList.add('show'); }, 50);
-
-            const pBar = document.getElementById('progress-bar');
-            pBar.style.width = '100%';
-            setTimeout(() => { pBar.style.opacity = '0'; }, 1000);
-        }
-
-        // --- PROGRESS BAR FAKE ANIMAÇÃO (Ajustado para ser mais devagar no início) ---
-        function animarProgressBar() {
-            const pb = document.getElementById('progress-bar');
-            const startTime = Date.now();
-            const delayMs = CONFIG.delayEmSegundos * 1000;
-
-            function step() {
-                if(delayDisparado) return;
-
-                const elapsed = Date.now() - startTime;
-                
-                // Mudei para ser mais devagar no inicio: de 0 a 10s ele vai pra 35%
-                if (elapsed <= 10000) {
-                    const p = (elapsed / 10000) * 35;
-                    pb.style.width = p + '%';
-                } else if (elapsed <= delayMs) {
-                    // Depois dos 10s ele vai de 35% a 95% mais logaritmicamente
-                    let ratio = (elapsed - 10000) / (delayMs - 10000);
-                    ratio = Math.pow(ratio, 0.7); // achatamento para manter suavidade
-                    const p = 35 + (ratio * 60);
-                    pb.style.width = p + '%';
-                }
-
-                if (elapsed < delayMs) {
-                    requestAnimationFrame(step);
-                }
-            }
-            requestAnimationFrame(step);
-        }
-        animarProgressBar();
-
-        // --- TABS E SCROLL ---
-        function scrollToForm() {
-            document.getElementById('checkout-section').scrollIntoView({ behavior: 'smooth' });
-        }
-
-        const checkoutForm = document.getElementById('checkout-section');
-        const fixedCta = document.getElementById('fixed-cta');
-
-        window.addEventListener('scroll', () => {
-            if (!delayDisparado || window.innerWidth > 768) {
-                fixedCta.classList.add('hidden');
-                return;
-            }
-            const rect = checkoutForm.getBoundingClientRect();
-            if (rect.top <= window.innerHeight && rect.bottom >= 0) {
-                fixedCta.style.opacity = '0';
-                setTimeout(() => fixedCta.classList.add('hidden'), 300);
-            } else {
-                fixedCta.classList.remove('hidden');
-                fixedCta.style.opacity = '1';
-                fixedCta.style.transform = 'translate(-50%, 0)';
-            }
-        });
-
-        // Configuração de abas Cartão / Pix (Mock style change)
-        const tabCartao = document.getElementById('tab-cartao');
-        const tabPix = document.getElementById('tab-pix');
-        const cartaoFields = document.getElementById('cartao-fields');
-        const btnFinalizar = document.getElementById('btn-finalizar');
-
-        tabCartao.addEventListener('click', () => {
-            tabCartao.classList.add('active');
-            tabPix.classList.remove('active');
-            cartaoFields.style.display = 'block';
-            btnFinalizar.innerHTML = 'PAGAR R$ 29,90 <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect width="18" height="11" x="3" y="11" rx="2" ry="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>';
-            btnFinalizar.style.background = 'linear-gradient(to right, #d4af37, #f3e5ab, #d4af37)';
-        });
-
-        tabPix.addEventListener('click', () => {
-            tabPix.classList.add('active');
-            tabCartao.classList.remove('active');
-            cartaoFields.style.display = 'none';
-            btnFinalizar.innerHTML = 'GERAR PIX <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect width="18" height="18" x="3" y="3" rx="2" ry="2"/><path d="M8 12h8"/><path d="M12 8v8"/></svg>';
-            // Pix green visual mock se quisesse, mas deixei o dourado para seguir coerencia da marca
-        });
-
-        // --- MÁSCARAS ---
-        function mascaraCPF(el) {
-            let v = el.value.replace(/\D/g, "");
-            v = v.replace(/(\d{3})(\d)/, "$1.$2");
-            v = v.replace(/(\d{3})(\d)/, "$1.$2");
-            v = v.replace(/(\d{3})(\d{1,2})$/, "$1-$2");
-            el.value = v;
-        }
-
-        const mascaraCelular = (valor) => {
-            valor = valor.replace(/\D/g, "");
-            valor = valor.replace(/^(\d{2})(\d)/g, "($1) $2");
-            valor = valor.replace(/(\d)(\d{4})$/, "$1-$2");
-            return valor;
-        };
-
-        const mascaraCartao = (valor) => {
-            valor = valor.replace(/\D/g, "");
-            valor = valor.replace(/(\d{4})(?=\d)/g, "$1 ");
-            return valor.trim();
-        };
-
-        const mascaraCEP = (valor) => {
-            valor = valor.replace(/\D/g, "");
-            valor = valor.replace(/^(\d{5})(\d)/, "$1-$2");
-            return valor;
-        };
-
-        document.getElementById('celular').addEventListener('input', (e) => { e.target.value = mascaraCelular(e.target.value); });
-        document.getElementById('num-cartao').addEventListener('input', (e) => { e.target.value = mascaraCartao(e.target.value); });
-        document.getElementById('cep').addEventListener('input', (e) => { e.target.value = mascaraCEP(e.target.value); });
-        
-        document.getElementById('mes-cartao').addEventListener('input', (e) => {
-            let v = e.target.value.replace(/\D/g, "");
-            if(v.length === 2 && parseInt(v) > 12) v = "12";
-            e.target.value = v;
-        });
-
-        document.getElementById('ano-cartao').addEventListener('input', (e) => { e.target.value = e.target.value.replace(/\D/g, ""); });
-        document.getElementById('cvv').addEventListener('input', (e) => { e.target.value = e.target.value.replace(/\D/g, ""); });
-
-        // --- POLÍTICA ---
-        function togglePolitica(e) {
-            e.preventDefault();
-            const sec = document.getElementById('politica-section');
-            sec.style.display = sec.style.display === 'block' ? 'none' : 'block';
-            if(sec.style.display === 'block') sec.scrollIntoView({ behavior: 'smooth' });
-        }
-
-        // --- SUBMISSÃO ---
-        document.getElementById('subscription-form').addEventListener('submit', (e) => {
-            e.preventDefault();
-            document.getElementById('main-content').style.display = 'none';
-            document.body.classList.remove('locked');
-            
-            document.getElementById('estado3').style.display = 'flex';
-            window.scrollTo(0,0);
-        });
-    </script>
+    <!-- External JS -->
+    <script src="script.js"></script>
 </body>
 </html>
