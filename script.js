@@ -62,16 +62,34 @@ document.addEventListener('DOMContentLoaded', () => {
 
     }
 
-    // --- PROGRESS BAR REAL (Sincronizado com o Vídeo) ---
-    const pb = document.getElementById('progress-bar');
-    if (video && pb) {
-        video.addEventListener('timeupdate', () => {
-            if (video.duration) {
-                const percent = (video.currentTime / video.duration) * 100;
-                pb.style.width = percent + '%';
+    // --- PROGRESS BAR FAKE ANIMAÇÃO (Retornando para a velocidade perfeita anterior) ---
+    function animarProgressBar() {
+        const pb = document.getElementById('progress-bar');
+        const startTime = Date.now();
+        const delayMs = CONFIG.delayEmSegundos * 1000;
+
+        function step() {
+            if(delayDisparado) return;
+
+            const elapsed = Date.now() - startTime;
+            
+            if (elapsed <= 10000) {
+                const p = (elapsed / 10000) * 35;
+                if(pb) pb.style.width = p + '%';
+            } else if (elapsed <= delayMs) {
+                let ratio = (elapsed - 10000) / (delayMs - 10000);
+                ratio = Math.pow(ratio, 0.7); 
+                const p = 35 + (ratio * 60);
+                if(pb) pb.style.width = p + '%';
             }
-        });
+
+            if (elapsed < delayMs) {
+                requestAnimationFrame(step);
+            }
+        }
+        requestAnimationFrame(step);
     }
+    animarProgressBar();
 
     // --- SCROLL MOBILE CTA ---
     const checkoutForm = document.getElementById('subscription-section');
