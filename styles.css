@@ -142,6 +142,7 @@ video {
     background-color: #1a1a1a;
     border-radius: 0;
     overflow: hidden;
+    z-index: 20; /* Garantir que fique acima do vídeo */
 }
 
 #progress-bar {
@@ -519,17 +520,24 @@ input::placeholder {
 }
 
 @media (max-width: 768px) {
+    .hero {
+        min-height: auto;
+        justify-content: flex-start;
+        padding-top: 10vh; /* Eleva os elementos pra cima */
+        margin-top: 0;
+    }
+    
     .headline { font-size: 1.8rem; }
-    .logo { font-size: 3rem; }
+    .logo { font-size: 3rem; margin-top: 0; }
     .input-row, .input-row-3 { grid-template-columns: 1fr; gap: 0; }
     #estado3 h1 { font-size: 2.5rem; }
     
     #estado2 {
-        transform: translateY(300px);
+        transform: translateY(150px);
     }
     #estado2.show {
         transform: translateY(0);
-        margin-top: -15vh;
+        margin-top: -2rem; /* Sobrepõe levemente o vídeo */
         position: relative;
         z-index: 20;
     }
