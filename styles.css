@@ -72,7 +72,7 @@ a { text-decoration: none; }
 
 .headline {
     font-family: var(--font-headings);
-    font-size: 2.5rem;
+    font-size: 3.5rem;
     text-align: center;
     margin-bottom: 1.5rem;
     max-width: 900px;
@@ -527,7 +527,7 @@ input::placeholder {
         margin-top: 0;
     }
     
-    .headline { font-size: 1.8rem; }
+    .headline { font-size: 2.6rem; }
     .logo { font-size: 3rem; margin-top: 0; }
     .input-row, .input-row-3 { grid-template-columns: 1fr; gap: 0; }
     #estado3 h1 { font-size: 2.5rem; }
@@ -545,6 +545,6 @@ input::placeholder {
 
 @media (max-width: 480px) {
     .container { padding: 0 10px; }
-    .headline { font-size: 1.4rem; }
+    .headline { font-size: 2.0rem; }
     .glass-panel { border-radius: 0; border-left: none; border-right: none; }
 }
