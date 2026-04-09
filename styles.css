@@ -151,8 +151,8 @@ video {
 #estado2 {
     padding-bottom: 4rem;
     opacity: 0;
-    transform: translateY(30px);
-    transition: opacity 0.8s ease, transform 0.8s ease;
+    transform: translateY(200px);
+    transition: opacity 1s ease, transform 1s cubic-bezier(0.16, 1, 0.3, 1);
 }
 
 #estado2.show {
@@ -519,6 +519,16 @@ input::placeholder {
     .logo { font-size: 3rem; }
     .input-row, .input-row-3 { grid-template-columns: 1fr; gap: 0; }
     #estado3 h1 { font-size: 2.5rem; }
+    
+    #estado2 {
+        transform: translateY(300px);
+    }
+    #estado2.show {
+        transform: translateY(0);
+        margin-top: -15vh;
+        position: relative;
+        z-index: 20;
+    }
 }
 
 @media (max-width: 480px) {
