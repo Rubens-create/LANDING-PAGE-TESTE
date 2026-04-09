@@ -98,7 +98,8 @@ a { text-decoration: none; }
     overflow: hidden;
     box-shadow: 0 20px 40px rgba(0,0,0,0.8);
     border: 1px solid var(--glass-border);
-    padding-bottom: 14px; /* Espaço para a barra de progresso */
+    display: flex;
+    flex-direction: column;
 }
 
 video {
@@ -134,15 +135,14 @@ video {
 }
 
 .progress-bar-container {
-    position: absolute;
-    bottom: 0;
-    left: 0;
     width: 100%;
     height: 14px;
     background-color: #1a1a1a;
     border-radius: 0;
     overflow: hidden;
-    z-index: 20; /* Garantir que fique acima do vídeo */
+    position: relative;
+    z-index: 20; 
+    margin-top: -1px; /* Remove qualquer gap subpixel originado de arredondamento de navegadores */
 }
 
 #progress-bar {
