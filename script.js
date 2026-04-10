@@ -51,10 +51,25 @@ document.addEventListener('DOMContentLoaded', () => {
         }, { once: true });
     }
 
-    // Mostra o botão de som com delay estratégico pra gerar curiosidade
+    // ✅ Mostra botão APENAS validando se o vídeo realmente engatou, mantendo coerência visual
+    let overlayMostrado = false;
+
+    video.addEventListener('playing', () => {
+        if (overlayMostrado) return;
+        overlayMostrado = true;
+
+        setTimeout(() => {
+            overlayButton.style.opacity = '1';
+        }, 1500);
+    });
+
+    // Fallback de Emergência (Garante que se falhar o play por rede lenta bloqueadora, botamos o botão à força)
     setTimeout(() => {
-        overlayButton.style.opacity = '1';
-    }, 1500);
+        if (video.paused && !overlayMostrado) {
+            overlayMostrado = true;
+            overlayButton.style.opacity = '1';
+        }
+    }, 3000);
 
     // Quando clicado -> libera áudio, volta o vídeo pro começo pra não perder o Pitch e tira botão da tela
     unmuteBtn.addEventListener('click', () => {
