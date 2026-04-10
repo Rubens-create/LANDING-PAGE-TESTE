@@ -37,10 +37,10 @@
                 
                 <div class="video-wrapper">
                     <div class="video-container">
-                        <div id="play-btn-overlay" class="play-overlay hidden">
-                            <svg viewBox="0 0 24 24"><path d="M8 5v14l11-7z"/></svg>
+                        <div id="play-btn-overlay" class="play-overlay" style="opacity: 0; transition: opacity 0.5s ease;">
+                            <button class="unmute-btn" id="unmuteBtn">🔊 ATIVAR SOM</button>
                         </div>
-                        <video id="main-video" playsinline>
+                        <video id="main-video" autoplay muted playsinline>
                             <source src="COPY-SB21D-001.mp4" type="video/mp4">
                             Seu navegador não suporta a tag de vídeo.
                         </video>

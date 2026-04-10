@@ -25,16 +25,31 @@ document.addEventListener('DOMContentLoaded', () => {
     // --- CONTROLE DE VÍDEO & DELAY ---
     const video = document.getElementById('main-video');
     const overlayButton = document.getElementById('play-btn-overlay');
+    const unmuteBtn = document.getElementById('unmuteBtn');
     let delayDisparado = false;
     let progressoIniciado = false;
     
-    // Forçar exibição do botão play (desativa autoplay mudo)
-    overlayButton.classList.remove('hidden');
-    video.muted = false;
+    // Lógica VSL Profissional
+    if (localStorage.getItem('soundEnabled')) {
+        video.muted = false;
+    } else {
+        video.muted = true;
+    }
 
-    overlayButton.addEventListener('click', () => {
+    // Mostra o botão de som com delay estratégico pra gerar curiosidade
+    setTimeout(() => {
+        overlayButton.style.opacity = '1';
+    }, 1500);
+
+    // Quando clicado -> libera áudio, volta o vídeo pro começo pra não perder o Pitch e tira botão da tela
+    unmuteBtn.addEventListener('click', () => {
+        video.muted = false;
+        video.volume = 1;
+        video.currentTime = 0; 
         video.play();
-        overlayButton.classList.add('hidden');
+        
+        overlayButton.style.display = 'none';
+        localStorage.setItem('soundEnabled', true);
         
         if (!progressoIniciado) {
             progressoIniciado = true;
