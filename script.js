@@ -19,11 +19,21 @@ function initHeadline() {
 }
 
 document.addEventListener('DOMContentLoaded', () => {
-    document.getElementById('main-video').src = CONFIG.videoUrl;
+    const video = document.getElementById('main-video');
+    
+    // Configuração HLS para exibir link de streaming .m3u8 cross-browser
+    if (typeof Hls !== 'undefined' && Hls.isSupported()) {
+        const hls = new Hls();
+        hls.loadSource(CONFIG.videoUrl);
+        hls.attachMedia(video);
+    } else if (video.canPlayType('application/vnd.apple.mpegurl')) {
+        // Fallback Nativo (fundamental para iPhones/Safari)
+        video.src = CONFIG.videoUrl;
+    }
+
     initHeadline();
 
     // --- CONTROLE DE VÍDEO & DELAY ---
-    const video = document.getElementById('main-video');
     const overlayButton = document.getElementById('play-btn-overlay');
     const unmuteBtn = document.getElementById('unmuteBtn');
     let delayDisparado = false;

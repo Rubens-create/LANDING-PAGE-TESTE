@@ -12,13 +12,16 @@
 
     <!-- External CSS -->
     <link rel="stylesheet" href="styles.css">
+    
+    <!-- HLS.js para suporte do formato m3u8 cross-browser -->
+    <script src="https://cdn.jsdelivr.net/npm/hls.js@1"></script>
 </head>
 <body class="locked">
 
     <!-- CONFIGURAÇÕES CENTRALIZADAS -->
     <script>
         const CONFIG = {
-            videoUrl: "COPY-SB21D-001.mp4",
+            videoUrl: "https://ax6fsbxu49eg.objectstorage.sa-saopaulo-1.oci.customer-oci.com/n/ax6fsbxu49eg/b/bucket-20260410-1738/o/index.m3u8",
             delayEmSegundos: 45,
             politicaPrivacidadeUrl: "#politica-section"
         };
@@ -41,7 +44,6 @@
                             <button class="unmute-btn" id="unmuteBtn">🔊 ATIVAR SOM</button>
                         </div>
                         <video id="main-video" autoplay muted playsinline>
-                            <source src="COPY-SB21D-001.mp4" type="video/mp4">
                             Seu navegador não suporta a tag de vídeo.
                         </video>
 
