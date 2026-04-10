@@ -32,10 +32,14 @@ document.addEventListener('DOMContentLoaded', () => {
     video.muted = true;
 
     // ✅ 4. Esperar o vídeo estar minimamente pronto para dar play robusto do fallback
+    let playAttempts = 0;
     function tryPlay() {
         video.play().catch(() => {
-            // tenta de novo depois (ex: aba presa em background ou mobile load)
-            setTimeout(() => tryPlay(), 500);
+            // Limitar as tentativas para não causar loop infinito e poupar CPU
+            if (playAttempts < 3) {
+                playAttempts++;
+                setTimeout(() => tryPlay(), 500);
+            }
         });
     }
 
