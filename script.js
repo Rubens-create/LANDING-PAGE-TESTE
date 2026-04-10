@@ -91,12 +91,10 @@ document.addEventListener('DOMContentLoaded', () => {
         overlayButton.style.display = 'none';
         localStorage.setItem('soundEnabled', true);
         
-        // Reinicia e reseta os tempos fluidos ao desmutar
-        if (!delayDisparado) startDelayTimer();
-        
-        if (!progressoIniciado) {
-            progressoIniciado = true;
-            animarProgressBar();
+        // Reinicia e reseta os tempos fluidos E a barra de progresso do ZERO ao desmutar
+        if (!delayDisparado) {
+            startDelayTimer();
+            startProgressBar();
         }
     });
 
@@ -112,8 +110,14 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 
     video.addEventListener('playing', () => {
-        // Toda vez que o vídeo der o primeiro play ou despausar, engata o cronômetro
+        // Toda vez que o vídeo der play ou despausar, engata o cronômetro
         startDelayTimer();
+        
+        // O progresso deve iniciar assim que o autoplay mudo começar!
+        if (!progressoIniciado) {
+            progressoIniciado = true;
+            startProgressBar();
+        }
     });
 
     function dispararDelay() {
@@ -126,16 +130,25 @@ document.addEventListener('DOMContentLoaded', () => {
 
     }
 
-    // --- PROGRESS BAR FAKE ANIMAÇÃO (Retornando para a velocidade perfeita anterior) ---
-    function animarProgressBar() {
+    // --- PROGRESS BAR FAKE ANIMAÇÃO ROBUSTA ---
+    let pbAnimationFrame;
+    let progressStartTime = 0;
+
+    function startProgressBar() {
         const pb = document.getElementById('progress-bar');
-        const startTime = Date.now();
+        progressStartTime = Date.now();
         const delayMs = CONFIG.delayEmSegundos * 1000;
+        
+        // Cancela qualquer loop de animação duplicado para permitir recomeçar limpo!
+        if (pbAnimationFrame) cancelAnimationFrame(pbAnimationFrame);
 
         function step() {
-            if(delayDisparado) return;
+            if(delayDisparado) {
+                if(pb) pb.style.width = '100%';
+                return;
+            }
 
-            const elapsed = Date.now() - startTime;
+            const elapsed = Date.now() - progressStartTime;
             
             if (elapsed <= 10000) {
                 const p = (elapsed / 10000) * 35;
@@ -148,12 +161,11 @@ document.addEventListener('DOMContentLoaded', () => {
             }
 
             if (elapsed < delayMs) {
-                requestAnimationFrame(step);
+                pbAnimationFrame = requestAnimationFrame(step);
             }
         }
-        requestAnimationFrame(step);
+        pbAnimationFrame = requestAnimationFrame(step);
     }
-    // Animação agora só é disparada ao clicar no Play
 
     // --- SCROLL MOBILE CTA ---
     const checkoutForm = document.getElementById('subscription-section');
