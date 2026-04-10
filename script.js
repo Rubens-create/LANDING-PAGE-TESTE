@@ -28,12 +28,23 @@ document.addEventListener('DOMContentLoaded', () => {
     const unmuteBtn = document.getElementById('unmuteBtn');
     let delayDisparado = false;
     let progressoIniciado = false;
-    
-    // Lógica VSL Profissional
-    if (localStorage.getItem('soundEnabled')) {
-        video.muted = false;
+    // ✅ 1 e 2. Sempre mudo no carregamento para evitar bloqueios cruciais
+    video.muted = true;
+
+    // ✅ 4. Esperar o vídeo estar minimamente pronto para dar play robusto do fallback
+    function tryPlay() {
+        video.play().catch(() => {
+            // tenta de novo depois (ex: aba presa em background ou mobile load)
+            setTimeout(() => tryPlay(), 500);
+        });
+    }
+
+    if (video.readyState >= 3) {
+        tryPlay();
     } else {
-        video.muted = true;
+        video.addEventListener('canplay', () => {
+            tryPlay();
+        }, { once: true });
     }
 
     // Mostra o botão de som com delay estratégico pra gerar curiosidade
