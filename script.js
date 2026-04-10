@@ -91,23 +91,34 @@ document.addEventListener('DOMContentLoaded', () => {
         overlayButton.style.display = 'none';
         localStorage.setItem('soundEnabled', true);
         
+        // Reinicia e reseta os tempos fluidos ao desmutar
+        if (!delayDisparado) startDelayTimer();
+        
         if (!progressoIniciado) {
             progressoIniciado = true;
             animarProgressBar();
         }
     });
 
-    // Trigger delay check
-    video.addEventListener('timeupdate', () => {
-        if (!delayDisparado && video.currentTime >= CONFIG.delayEmSegundos) dispararDelay();
-    });
+    // Trigger delay check baseado em setTimeout (fluido e independente do timeupdate do player)
+    let cronometroDelay;
+    
+    function startDelayTimer() {
+        if (delayDisparado) return;
+        clearTimeout(cronometroDelay);
+        cronometroDelay = setTimeout(() => {
+            if (!delayDisparado) dispararDelay();
+        }, CONFIG.delayEmSegundos * 1000);
+    }
 
-    window.setInterval(() => {
-        if(!delayDisparado && video.currentTime >= CONFIG.delayEmSegundos) dispararDelay();
-    }, 1000);
+    video.addEventListener('playing', () => {
+        // Toda vez que o vídeo der o primeiro play ou despausar, engata o cronômetro
+        startDelayTimer();
+    });
 
     function dispararDelay() {
         delayDisparado = true;
+        clearTimeout(cronometroDelay);
         document.body.classList.remove('locked');
         const estado2 = document.getElementById('estado2');
         estado2.classList.remove('hidden');
