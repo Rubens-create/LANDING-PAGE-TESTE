@@ -26,22 +26,20 @@ document.addEventListener('DOMContentLoaded', () => {
     const video = document.getElementById('main-video');
     const overlayButton = document.getElementById('play-btn-overlay');
     let delayDisparado = false;
+    let progressoIniciado = false;
     
-    video.muted = true;
-    const tryAutoplay = async () => {
-        try {
-            await video.play();
-            overlayButton.classList.add('hidden');
-        } catch (err) {
-            overlayButton.classList.remove('hidden');
-        }
-    }
-    tryAutoplay();
+    // Forçar exibição do botão play (desativa autoplay mudo)
+    overlayButton.classList.remove('hidden');
+    video.muted = false;
 
     overlayButton.addEventListener('click', () => {
-        video.muted = false;
         video.play();
         overlayButton.classList.add('hidden');
+        
+        if (!progressoIniciado) {
+            progressoIniciado = true;
+            animarProgressBar();
+        }
     });
 
     // Trigger delay check
@@ -89,7 +87,7 @@ document.addEventListener('DOMContentLoaded', () => {
         }
         requestAnimationFrame(step);
     }
-    animarProgressBar();
+    // Animação agora só é disparada ao clicar no Play
 
     // --- SCROLL MOBILE CTA ---
     const checkoutForm = document.getElementById('subscription-section');
